@@ -4,7 +4,13 @@ description: "Shared Packaging"
 runs:
   using: "composite"
   steps:
-    - name: build.sh
+    - name: Download Workflow Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+
+    - name: List Downloaded Artifacts
       run: |
-        echo "Test"
+        echo "Downloaded Artifacts:"
+        ls -R artifacts
       shell: bash

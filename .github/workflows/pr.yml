@@ -23,7 +23,7 @@
 # NOTES
 #   - Uses an empty certificate thumbprint since code signing is not required for PR builds.
 #   - Optimized builds are disabled, focusing only on basic build validation.
-name: 1. Pull Request 🩺
+name: Pull Request
 on:
   workflow_dispatch:
 

@@ -18,7 +18,7 @@
 #
 # USAGE
 #   This workflow is intended for generating production-ready builds.
-name: 2. Release 🚀
+name: Release
 on:
   workflow_dispatch:
     inputs:

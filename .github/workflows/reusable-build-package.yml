@@ -1,10 +1,10 @@
-name: 🔒 Reusable Build Package
+name: 🔒 Reusable Shared Package
 on:
   workflow_call:
 
 jobs:
   build:
-    name: Package
+    name: Build
     runs-on: ubuntu-latest
     continue-on-error: false
 
@@ -12,6 +12,6 @@ jobs:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      - name: Run Packaging
+      - name: Create Package
         id: packaging
         uses: ./.github/actions/Shared/run-packaging

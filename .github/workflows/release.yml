@@ -70,5 +70,5 @@ jobs:
     # Failures or Cancelled jobs are not fine.
     needs: [build-windows, build-linux]
     if: ${{ always() && !failure() && !cancelled() }}
-    name: "Packaging"
+    name: "Package"
     uses: ./.github/workflows/reusable-build-package.yml

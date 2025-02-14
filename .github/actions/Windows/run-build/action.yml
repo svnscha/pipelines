@@ -91,7 +91,7 @@ runs:
     # - The artifact name is dynamically set based on the platform and configuration.
     # - The artifact path is determined by the previously defined 'build-output-dir' variable.
     - name: Save Artifact
-      if: inputs.SaveArtifact == true
+      if: inputs.SaveArtifact == 'true'
       uses: actions/upload-artifact@v4
       with:
         name: ${{ steps.set-vars.outputs.build-artifact-name }}

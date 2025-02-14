@@ -1,0 +1,10 @@
+name: "Packaging"
+description: "Shared Packaging"
+
+runs:
+  using: "composite"
+  steps:
+    - name: build.sh
+      run: |
+        echo "Test"
+      shell: bash

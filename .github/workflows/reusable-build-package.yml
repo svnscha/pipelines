@@ -1,0 +1,17 @@
+name: 🔒 Reusable Build Package
+on:
+  workflow_call:
+
+jobs:
+  build:
+    name: Package
+    runs-on: ubuntu-latest
+    continue-on-error: false
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Run Packaging
+        id: packaging
+        uses: ./.github/actions/Shared/run-packaging

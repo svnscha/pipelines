@@ -64,3 +64,11 @@ jobs:
       Configuration: Release
       Platform: ${{ matrix.Platform }}
       SaveArtifact: true
+
+  build-package:
+    # Skipped and Successful jobs are fine.
+    # Failures or Cancelled jobs are not fine.
+    needs: [build-windows, build-linux]
+    if: ${{ always() && !failure() && !cancelled() }}
+    name: "Packaging"
+    uses: ./.github/workflows/reusable-build-package.yml

@@ -18,7 +18,10 @@
 #
 # JOBS
 #   - build   Executes the build process on a Windows runner.
-name: Windows Build
+
+# Good ol' prefix, cannot hide on GitHub Actions UI.
+# See https://github.com/orgs/community/discussions/12025
+name: 🔒 Reusable Windows Build
 on:
   workflow_call:
     inputs:

@@ -37,7 +37,7 @@ on:
 
 jobs:
   build:
-    name: ${{ inputs.Configuration }}
+    name: Build
     runs-on: ubuntu-latest
     continue-on-error: false
 

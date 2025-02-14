@@ -40,7 +40,7 @@ on:
 
 jobs:
   build:
-    name: ${{ inputs.Configuration }}
+    name: Build
     runs-on: windows-latest
     continue-on-error: false
 

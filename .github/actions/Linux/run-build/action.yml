@@ -1,0 +1,49 @@
+# GitHub Actions - Composite
+# Reference the Windows version as the primary documentation source.
+# The Linux version follows the same principles with slight adjustments
+# to align with Linux-specific build scenarios.
+name: "Build"
+description: "Linux Build"
+inputs:
+  Configuration:
+    description: The build configuration.
+    required: true
+  Platform:
+    required: true
+    description: The build platform.
+  SaveArtifact:
+    required: true
+    description: Saves the build output as an artifact.
+
+outputs:
+  build-output-dir:
+    description: The build output directory on the build server. Always returned.
+    value: ${{ steps.set-vars.outputs.build-output-dir }}
+  build-artifact-name:
+    description: The build artifact. Always returned, even if not used.
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set Variables
+      id: set-vars
+      run: |
+        # Set environment variables
+        echo "build-output-dir=${GITHUB_WORKSPACE}/out/Linux/${{ inputs.Platform }}" >> $GITHUB_OUTPUT
+        echo "build-artifact-name=linux-build-${{ inputs.Platform }}-${{ inputs.Configuration }}" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: build.sh
+      run: |
+        ./src/Linux/build.sh \
+          --platform "${{ inputs.Platform }}" \
+          --configuration "${{ inputs.Configuration }}" \
+          --target "${{ steps.set-vars.outputs.build-output-dir }}"
+      shell: bash
+
+    - name: Save Artifact
+      if: inputs.SaveArtifact == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.set-vars.outputs.build-artifact-name }}
+        path: ${{ steps.set-vars.outputs.build-output-dir }}

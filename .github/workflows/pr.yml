@@ -42,3 +42,15 @@ jobs:
       SaveArtifact: false
     secrets:
       CertificateThumbprint: ""
+
+  build-linux:
+    name: "Linux"
+    strategy:
+      matrix:
+        Platform: [x86_64, i686, aarch64]
+
+    uses: ./.github/workflows/reusable-build-linux.yml
+    with:
+      Configuration: Release
+      Platform: ${{ matrix.Platform }}
+      SaveArtifact: false

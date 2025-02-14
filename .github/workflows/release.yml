@@ -22,8 +22,15 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
+
       build_for_windows:
         description: "Build for Windows?"
+        type: boolean
+        required: true
+        default: true
+
+      build_for_linux:
+        description: "Build for Linux?"
         type: boolean
         required: true
         default: true
@@ -44,3 +51,16 @@ jobs:
       SaveArtifact: true
     secrets:
       CertificateThumbprint: ${{ secrets.WINDOWS_CERTIFICATE_THUMBPRINT }}
+
+  build-linux:
+    if: inputs.build_for_linux
+    name: "Linux"
+    strategy:
+      matrix:
+        Platform: [x86_64, i686, aarch64]
+
+    uses: ./.github/workflows/reusable-build-linux.yml
+    with:
+      Configuration: Release
+      Platform: ${{ matrix.Platform }}
+      SaveArtifact: false

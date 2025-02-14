@@ -1,0 +1,54 @@
+# Linux Build Workflow (Reusable)
+#
+# SYNOPSIS
+#   Automates the Linux build process using GitHub Actions.
+#
+# DESCRIPTION
+#   This workflow is reusable via `workflow_call` in other workflows.
+#   It checks out the source code, executes a Linux build using a composite action,
+#   and optionally saves the build artifact.
+#
+# INPUTS
+#   - Platform        The target platform (e.g., x86_64, ARM64).
+#   - Configuration   The build configuration (e.g., Debug, Release).
+#   - SaveArtifact    Boolean flag to determine if the build output should be saved.
+#
+# JOBS
+#   - build   Executes the build process on a Linux runner.
+#
+# NOTES
+#   - No code signing is required for Linux builds.
+
+# Good ol' prefix, cannot hide on GitHub Actions UI.
+# See https://github.com/orgs/community/discussions/12025
+name: 🔒 Reusable Linux Build
+on:
+  workflow_call:
+    inputs:
+      Platform:
+        type: string
+        required: true
+      Configuration:
+        type: string
+        required: true
+      SaveArtifact:
+        type: boolean
+        required: true
+
+jobs:
+  build:
+    name: ${{ inputs.Configuration }}
+    runs-on: ubuntu-latest
+    continue-on-error: false
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Run Linux Build
+        id: build
+        uses: ./.github/actions/Linux/run-build
+        with:
+          Configuration: ${{ inputs.Configuration }}
+          Platform: ${{ inputs.Platform }}
+          SaveArtifact: ${{ inputs.SaveArtifact }}

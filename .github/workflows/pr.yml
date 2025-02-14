@@ -1,0 +1,44 @@
+# Pull Request Build Workflow
+#
+# SYNOPSIS
+#   Validates build compatibility across all platforms without storing artifacts.
+#
+# DESCRIPTION
+#   This workflow is designed to run on pull requests to ensure that code changes
+#   do not break the build process. It compiles the project across multiple platforms
+#   but does not produce optimized or signed builds. No build artifacts are stored.
+#
+# TRIGGERS
+#   - Manually triggered via `workflow_dispatch`.
+#
+# INPUTS
+#   None (predefined platform matrix is used).
+#
+# JOBS
+#   - build-windows  Builds the application on multiple Windows platforms.
+#
+# STRATEGY
+#   - Uses a matrix to test builds across x64, Win32, and ARM64 architectures.
+#
+# NOTES
+#   - Uses an empty certificate thumbprint since code signing is not required for PR builds.
+#   - Optimized builds are disabled, focusing only on basic build validation.
+name: Pull Request
+on:
+  workflow_dispatch:
+
+jobs:
+
+  build-windows:
+    name: "Windows"
+    strategy:
+      matrix:
+        Platform: [x64, Win32, ARM64]
+
+    uses: ./.github/workflows/reusable-build-windows.yml
+    with:
+      Configuration: Release
+      Platform: ${{ matrix.Platform }}
+      SaveArtifact: false
+    secrets:
+      CertificateThumbprint: ""

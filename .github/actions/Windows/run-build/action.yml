@@ -1,0 +1,98 @@
+# GitHub Actions - Composite
+# This composite action establishes a standardized approach for building Windows applications.
+# It serves as a reusable component in workflows, streamlining the build process.
+#
+# The core steps include:
+# - Building the product
+# - Building the installer
+# - Saving artifacts (optional)
+#
+# This ensures a consistent, maintainable, and robust build pipeline applicable to almost any Windows-targeted product.
+#
+# Additional steps such as testing and validation should be implemented within workflows as needed.
+name: "Build"
+description: "Windows Build"
+
+# GitHub Actions - Inputs
+# Keep input definitions minimal yet effective to support different workflow scenarios.
+
+inputs:
+  # Defines the build configuration, typically 'Debug' or 'Release'.
+  Configuration:
+    description: The build configuration.
+    required: true
+
+  # Specifies the target CPU architecture (e.g., x86, x64, ARM64).
+  Platform:
+    required: true
+    description: The build platform.
+
+  # Used for signing builds. Requires a code-signing certificate installed on the build server.
+  CertificateThumbprint:
+    required: true
+    description: Certificate thumbprint for signing builds.
+
+  # Determines whether to save the build output as an artifact.
+  # Typically used for release builds, not for pull request validation.
+  SaveArtifact:
+    required: true
+    description: Saves the build output as an artifact.
+
+# GitHub Actions - Outputs
+# These outputs provide essential build metadata for downstream workflow steps.
+
+outputs:
+  # Specifies the directory where the build output is stored on the build server.
+  # This output is always available, regardless of whether artifacts are saved.
+  build-output-dir:
+    description: The build output directory on the build server. Always returned.
+    value: ${{ steps.set-vars.outputs.build-output-dir }}
+
+  # Represents the name of the generated build artifact.
+  # This value is always returned, even if the artifact is not uploaded.
+  build-artifact-name:
+    description: The build artifact. Always returned, even if not used.
+
+runs:
+  using: "composite"
+  steps:
+
+    # GitHub Actions - Variables
+    # Define and initialize step variables.
+    # This step sets reusable variables for the action.
+    # - 'build-output-dir': Used as both an action output and within steps.
+    # - 'build-artifact-name': Used as both an action output and within steps.
+    - name: Set Variables
+      id: set-vars
+      run: |
+        # Set
+        "build-output-dir=$env:GITHUB_WORKSPACE\out\Windows\${{ inputs.Platform }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+        "build-artifact-name=win-build-${{ inputs.Platform }}-${{ inputs.Configuration }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+      shell: powershell
+
+    # Building
+    # Build Product and Installer
+    #
+    # Guiding Principle: Use the same commands you would execute locally.
+    # Ensure the build process remains straightforward by leveraging automated CLI builds
+    # with a wrapper script that accepts simple input parameters.
+    - name: Build.ps1
+      env:
+        CERT_THUMBPRINT: "${{ inputs.CertificateThumbprint }}"
+      run: |
+        .\src\Windows\Build.ps1 `
+          -Platform "${{ inputs.Platform }}" `
+          -Configuration "${{ inputs.Configuration }}" `
+          -Target "${{ steps.set-vars.outputs.build-output-dir }}"
+      shell: powershell
+
+    # GitHub Actions - Save Build Artifact
+    # This step uploads the built output as an artifact if 'SaveArtifact' is enabled.
+    # - The artifact name is dynamically set based on the platform and configuration.
+    # - The artifact path is determined by the previously defined 'build-output-dir' variable.
+    - name: Save Artifact
+      if: inputs.SaveArtifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.set-vars.outputs.build-artifact-name }}
+        path: ${{ steps.set-vars.outputs.build-output-dir }}

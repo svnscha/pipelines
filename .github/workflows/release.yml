@@ -1,0 +1,46 @@
+# Release Build Workflow
+#
+# SYNOPSIS
+#   Triggers a release pipeline that builds and tests all target platforms.
+#
+# DESCRIPTION
+#   This workflow is manually triggered and initiates a full release build.
+#   It ensures all builds are optimized, signed, and produces artifacts.
+#
+# TRIGGERS
+#   - Manually triggered via `workflow_dispatch`.
+#
+# INPUTS
+#   - build_for_windows  Boolean flag to enable or disable Windows builds.
+#
+# OUTPUTS
+#   - Optimized and signed build artifacts.
+#
+# USAGE
+#   This workflow is intended for generating production-ready builds.
+name: Release
+on:
+  workflow_dispatch:
+    inputs:
+      build_for_windows:
+        description: "Build for Windows?"
+        type: boolean
+        required: true
+        default: true
+
+jobs:
+
+  build-windows:
+    if: inputs.build_for_windows
+    name: "Windows"
+    strategy:
+      matrix:
+        Platform: [x64, Win32, ARM64]
+
+    uses: ./.github/workflows/reusable-build-windows.yml
+    with:
+      Configuration: Release
+      Platform: ${{ matrix.Platform }}
+      SaveArtifact: true
+    secrets:
+      CertificateThumbprint: ${{ secrets.WINDOWS_CERTIFICATE_THUMBPRINT }}

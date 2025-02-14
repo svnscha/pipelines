@@ -1,0 +1,55 @@
+# Windows Build Workflow (reusable)
+#
+# SYNOPSIS
+#   Automates the Windows build process using GitHub Actions.
+#
+# DESCRIPTION
+#   This workflow is designed to be reusable via `workflow_call` in other workflows.
+#   It checks out the source code, executes a Windows build using a composite action,
+#   and optionally saves the build artifact.
+#
+# INPUTS
+#   - Platform        The target platform (e.g., x86, x64, ARM64).
+#   - Configuration   The build configuration (e.g., Debug, Release).
+#   - SaveArtifact    Boolean flag to determine if the build output should be saved.
+#
+# SECRETS
+#   - CertificateThumbprint   Required for signing builds, passed securely as a secret.
+#
+# JOBS
+#   - build   Executes the build process on a Windows runner.
+name: Windows Build
+on:
+  workflow_call:
+    inputs:
+      Platform:
+        type: string
+        required: true
+      Configuration:
+        type: string
+        required: true
+      SaveArtifact:
+        type: boolean
+        required: true
+    secrets:
+      CertificateThumbprint:
+        required: true
+
+jobs:
+  build:
+    name: ${{ inputs.Configuration }}
+    runs-on: windows-latest
+    continue-on-error: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build
+        id: build
+        uses: ./.github/actions/Windows/run-build
+        with:
+          Configuration: ${{ inputs.Configuration }}
+          Platform: ${{ inputs.Platform }}
+          SaveArtifact: ${{ inputs.SaveArtifact }}
+          CertificateThumbprint: ${{ secrets.CertificateThumbprint }}

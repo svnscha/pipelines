@@ -63,4 +63,4 @@ jobs:
     with:
       Configuration: Release
       Platform: ${{ matrix.Platform }}
-      SaveArtifact: false
+      SaveArtifact: true

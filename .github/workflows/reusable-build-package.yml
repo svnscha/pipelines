@@ -15,3 +15,6 @@ jobs:
       - name: Create Package
         id: packaging
         uses: ./.github/actions/Shared/run-packaging
+
+      - name: Test markdown
+        run: echo '### Hello world! :rocket:' >> $GITHUB_STEP_SUMMARY
